@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:23:06 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 03:23:46 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 04:02:01 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ void	*routine_philo(void *arg)
 {
 	t_philo *const	p = arg;
 
+	p->time_last_meal = get_time();
 	if (p->i % 2 == 0)
 		usleep(42);
-	set_last_meal(p);
 	while (!is_dead_or_satisfied(p->ctx))
 	{
 		pthread_mutex_lock(p->fork_primary);
