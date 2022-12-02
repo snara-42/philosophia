@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:23:48 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 03:23:51 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 04:11:29 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,14 @@ bool	is_dead_or_satisfied(t_ctx *ctx)
 int	print_log(const t_philo *p, const char *s)
 {
 	const time_t	now = get_time();
+	bool			ret;
 
-	if (is_dead_or_satisfied(p->ctx))
-		return (1);
 	pthread_mutex_lock(&p->ctx->mu_print);
-	printf("%ld %zu %s\n", now, p->i, s);
+	ret = (p->ctx->n_is_dead || p->ctx->n_is_satisfied >= p->ctx->n_philo);
+	if (!ret)
+		printf("%ld %zu %s\n", now, p->i, s);
 	pthread_mutex_unlock(&p->ctx->mu_print);
-	return (0);
+	return (ret);
 }
 
 time_t	get_last_meal(t_philo *p)
