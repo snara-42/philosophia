@@ -1,37 +1,62 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/03 03:21:22 by subaru            #+#    #+#             */
+/*   Updated: 2022/12/03 03:46:41 by subaru           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 
 #include "philo.h"
 
-int	init_ctx(t_ctx *ctx, int ac, char *av[]) //TODO
+#define BASE10 "0123456789"
+
+int	parse_args(t_ctx *ctx, int ac, char *av[])
 {
-	if (!(ac == 5 || ac == 6))
+	unsigned int	n[6];
+
+	if (ac == 5)
+		av[5] = "2147483647";
+	if (!(ac == 5 || ac == 6)
+		|| (!ft_parseuint_base(av[1], &n[1], BASE10) || n[1] < 1)
+		|| (!ft_parseuint_base(av[2], &n[2], BASE10) || n[2] < 60)
+		|| (!ft_parseuint_base(av[3], &n[3], BASE10) || n[3] < 60)
+		|| (!ft_parseuint_base(av[4], &n[4], BASE10) || n[4] < 60)
+		|| (!ft_parseuint_base(av[5], &n[5], BASE10) || n[5] < 1)
+	)
 		return (1);
-	*ctx = (t_ctx){};
-	sscanf(av[1], "%lu", &ctx->n_philo);
-	sscanf(av[2], "%ld", &ctx->time_die);
-	sscanf(av[3], "%ld", &ctx->time_eat);
-	sscanf(av[4], "%ld", &ctx->time_sleep);
-	ctx->n_eat = -1;
-	if (ac == 6)
-		sscanf(av[5], "%llu", &ctx->n_eat);
-	pthread_mutex_init(&ctx->mu_print, NULL);
+	*ctx = (t_ctx){
+		.n_philo = n[1], .time_die = n[2], .time_eat = n[3],
+		.time_sleep = n[4], .n_eat = n[5], };
+	return (0);
+}
+
+int	init_philos(t_ctx *ctx)
+{
+	t_philo			*p;
+	size_t			i;
+	const size_t	n = ctx->n_philo;
+
 	ctx->philos = malloc(sizeof(t_philo) * ctx->n_philo);
-
-	size_t	i;
-	t_philo	*p;
-
-	i = -1;
-	while (++i < ctx->n_philo)
+	if (!ctx->philos || pthread_mutex_init(&ctx->mu_print, NULL))
+		return (1);
+	i = 0;
+	while (i < ctx->n_philo)
 	{
 		p = &ctx->philos[i];
-		*p = (t_philo){.i = i + 1, .ctx = ctx,};
-		pthread_mutex_init(&p->mu_fork, NULL);
-		p->fork_primary = &ctx->philos[(i + !(i % 2)) % ctx->n_philo].mu_fork;
-		p->fork_secondary = &ctx->philos[(i + (i % 2)) % ctx->n_philo].mu_fork;
+		*p = (t_philo){.i = i + 1, .ctx = ctx};
+		p->fork_primary = &ctx->philos[(i + (i % 2)) % n].mu_fork;
+		p->fork_secondary = &ctx->philos[(i + !(i % 2)) % n].mu_fork;
+		if (pthread_mutex_init(&p->mu_fork, NULL))
+			return (1);
+		i++;
 	}
 	return (0);
 }
@@ -44,9 +69,10 @@ int	destroy_ctx(t_ctx *ctx)
 
 	i = 0;
 	ret = 0;
-	while (i < ctx->n_philo)
+	while (ctx->philos && i < ctx->n_philo)
 	{
-		if (pthread_mutex_destroy(&ctx->philos[i].mu_fork))
+		p = &ctx->philos[i];
+		if (pthread_mutex_destroy(&p->mu_fork))
 			ret = 1;
 		i++;
 	}
@@ -56,116 +82,28 @@ int	destroy_ctx(t_ctx *ctx)
 	return (ret);
 }
 
-bool	is_dead_or_satisfied(t_ctx *ctx)
-{
-	bool	ret;
-
-	pthread_mutex_lock(&ctx->mu_print);
-	ret = (ctx->n_is_dead || ctx->n_is_satisfied >= ctx->n_philo);
-	pthread_mutex_unlock(&ctx->mu_print);
-	return (ret);
-}
-
-int	print_log(const t_philo *p, const char *s)
-{
-	const time_t	now = get_time();
-
-	if (is_dead_or_satisfied(p->ctx))
-		return (1);
-	pthread_mutex_lock(&p->ctx->mu_print);
-	printf("%ld %zu %s\n", now, p->i, s);
-	pthread_mutex_unlock(&p->ctx->mu_print);
-	return (0);
-}
-
-time_t	get_last_meal(t_philo *p)
-{
-	time_t	ret;
-
-	pthread_mutex_lock(&p->ctx->mu_print);
-	ret = p->time_last_meal;
-	pthread_mutex_unlock(&p->ctx->mu_print);
-	return (ret);
-}
-
-void	set_last_meal(t_philo *p)
-{
-	const time_t	now = get_time();
-
-	pthread_mutex_lock(&p->ctx->mu_print);
-	p->time_last_meal = now;
-	pthread_mutex_unlock(&p->ctx->mu_print);
-}
-
-uint64_t	mutex_var_add(pthread_mutex_t *mu, uint64_t *p, uint64_t n)
-{
-	uint64_t	ret;
-
-	pthread_mutex_lock(mu);
-	*p += n;
-	ret = *p;
-	pthread_mutex_unlock(mu);
-	return (ret);
-}
-
-void	*routine_philo(void *arg)
-{
-	t_philo *const	p = arg;
-
-	set_last_meal(p);
-	while (!is_dead_or_satisfied(p->ctx))
-	{
-		pthread_mutex_lock(p->fork_primary);
-		print_log(p, "has taken a fork");
-		pthread_mutex_lock(p->fork_secondary);
-
-		print_log(p, "is eating");
-		set_last_meal(p);
-		msleep(p->ctx->time_eat);
-		if (++p->meal_count >= p->ctx->n_eat)
-			mutex_var_add(&p->ctx->mu_print, &p->ctx->n_is_satisfied, 1);
-
-		pthread_mutex_unlock(p->fork_secondary);
-		pthread_mutex_unlock(p->fork_primary);
-
-		print_log(p, "is sleeping");
-		msleep(p->ctx->time_sleep);
-
-		print_log(p, "is thinking");
-	}
-	return (NULL);
-}
-
-void	*routine_doctor(void *arg)
-{
-	t_philo *const	p = arg;
-	time_t			now;
-
-	msleep(1);
-	while (!is_dead_or_satisfied(p->ctx))
-	{
-		now = get_time();
-		if (now > get_last_meal(p) + p->ctx->time_die) //
-		{
-			pthread_mutex_lock(&p->ctx->mu_print);
-			printf("%ld %zu %s\n", now, p->i, "died");
-			p->ctx->n_is_dead = 1;
-			pthread_mutex_unlock(&p->ctx->mu_print);
-		}
-		msleep(1);
-	}
-	return (NULL);
-}
-
-
 int	main(int ac, char *av[])
 {
 	t_ctx	ctx;
 
-	if ((init_ctx(&ctx, ac, av) && printf("error init\n"))
-			|| (create_threads(&ctx) && printf("error creating thread\n"))
-			|| (join_threads(&ctx) && printf("error joining thread\n"))
-	   )
+	if ((parse_args(&ctx, ac, av) && printf("usage: ./philo "
+				"number_of_philosophers time_to_die time_to_eat time_to_sleep"
+				" [number_of_times_each_philosopher_must_eat]\n"))
+		|| (init_philos(&ctx) && printf("error init\n"))
+		|| (create_threads(&ctx) && printf("error creating thread\n"))
+		|| (join_threads(&ctx) && printf("error joining thread\n"))
+		|| (destroy_ctx(&ctx) && printf("error cleaning up\n"))
+	)
 		return (1);
 	return (0);
 }
+
+#ifdef LEAKS
+
+__attribute__((destructor))
+void	destructor(void)
+{
+	system("leaks -q philo 1>&2");
+}
+
+#endif
