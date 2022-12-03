@@ -1,5 +1,5 @@
 NAME = philo
-SRCS = main.c routine.c routine_utils.c thread.c time.c ft_parseint.c 
+SRCS = main.c init.c routine.c routine_utils.c thread.c time.c ft_parseint.c 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 

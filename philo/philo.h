@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:24:35 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 03:26:35 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 11:22:08 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,10 @@ struct s_ctx
 	pthread_mutex_t	mu_print;
 	struct s_philo	*philos;
 };
+
+int		parse_args(t_ctx *ctx, int ac, char *av[]);
+int		init_philos(t_ctx *ctx);
+int		destroy_ctx(t_ctx *ctx);
 
 void	*routine_philo(void *arg);
 void	*routine_doctor(void *arg);
