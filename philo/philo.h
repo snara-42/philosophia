@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:24:35 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 11:22:08 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 20:06:15 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,14 @@ int		destroy_ctx(t_ctx *ctx);
 void	*routine_philo(void *arg);
 void	*routine_doctor(void *arg);
 
-bool	is_dead_or_satisfied(t_ctx *ctx);
+void	take_forks(t_philo *p);
+void	release_forks(t_philo *p);
 int		print_log(const t_philo *p, const char *s);
+void	notify_death(t_philo *p);
+bool	is_dead_or_satisfied(t_ctx *ctx);
 time_t	get_last_meal(t_philo *p);
 void	set_last_meal(t_philo *p);
-int64_t	mutex_var_add(pthread_mutex_t *mu, uint64_t *p, uint64_t n);
+int64_t	var_add(pthread_mutex_t *mu, uint64_t *p, uint64_t n);
 
 int		create_threads(t_ctx *ctx);
 int		detach_threads(t_ctx *ctx);

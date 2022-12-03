@@ -6,12 +6,11 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:23:48 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 04:28:05 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 20:08:50 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <stdio.h>
 
 bool	is_dead_or_satisfied(t_ctx *ctx)
 {
@@ -20,20 +19,6 @@ bool	is_dead_or_satisfied(t_ctx *ctx)
 	pthread_mutex_lock(&ctx->mu_print);
 	ret = (ctx->n_is_dead || ctx->n_is_satisfied >= ctx->n_philo);
 	pthread_mutex_unlock(&ctx->mu_print);
-	return (ret);
-}
-
-int	print_log(const t_philo *p, const char *s)
-{
-	time_t	now;
-	bool	ret;
-
-	pthread_mutex_lock(&p->ctx->mu_print);
-	now = get_time();
-	ret = (p->ctx->n_is_dead || p->ctx->n_is_satisfied >= p->ctx->n_philo);
-	if (!ret)
-		printf("%ld %zu %s\n", now, p->i, s);
-	pthread_mutex_unlock(&p->ctx->mu_print);
 	return (ret);
 }
 
@@ -56,7 +41,7 @@ void	set_last_meal(t_philo *p)
 	pthread_mutex_unlock(&p->ctx->mu_print);
 }
 
-int64_t	mutex_var_add(pthread_mutex_t *mu, uint64_t *p, uint64_t n)
+int64_t	var_add(pthread_mutex_t *mu, uint64_t *p, uint64_t n)
 {
 	uint64_t	ret;
 

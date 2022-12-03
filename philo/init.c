@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 11:19:25 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 11:22:09 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/03 19:53:10 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #define BASE10 "0123456789"
 
-int		parse_args(t_ctx *ctx, int ac, char *av[])
+int	parse_args(t_ctx *ctx, int ac, char *av[])
 {
 	unsigned int	n[6];
 
@@ -35,7 +35,7 @@ int		parse_args(t_ctx *ctx, int ac, char *av[])
 	return (0);
 }
 
-int		init_philos(t_ctx *ctx)
+int	init_philos(t_ctx *ctx)
 {
 	t_philo			*p;
 	size_t			i;
@@ -58,7 +58,7 @@ int		init_philos(t_ctx *ctx)
 	return (0);
 }
 
-int		destroy_ctx(t_ctx *ctx)
+int	destroy_ctx(t_ctx *ctx)
 {
 	size_t	i;
 	t_philo	*p;
@@ -78,4 +78,3 @@ int		destroy_ctx(t_ctx *ctx)
 	free(ctx->philos);
 	return (ret);
 }
-
