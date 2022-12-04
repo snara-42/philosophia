@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:23:55 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/04 02:14:54 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/04 12:30:42 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,10 @@ void	*routine_monitor(void *arg)
 	size_t			i;
 
 	i = 0;
-	while (i < ctx->n_philo)
+	while (i++ < ctx->n_philo)
 	{
 		sem_wait(ctx->sem_done);
-		i++;
 	}
-	sem_post(ctx->sem_print);
 	kill_processes(ctx);
 	return (NULL);
 }
@@ -88,7 +86,7 @@ int	wait_processes(t_ctx *ctx)
 	while (i < ctx->n_philo)
 	{
 		p = &ctx->philos[i];
-		if (waitpid(p->pid, &status, 0))
+		if (waitpid(p->pid * 0, &status, 0))
 			ret = 1;
 		i++;
 	}

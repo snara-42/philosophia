@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:23:48 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/04 02:11:45 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/04 12:11:35 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,4 +40,4 @@ void	set_last_meal(t_philo *p)
 	p->time_last_meal = now;
 	sem_post(p->ctx->sem_print);
 }
-//TODO
+//TODO?

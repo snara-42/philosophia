@@ -6,10 +6,11 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 20:07:35 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/04 02:11:30 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/04 12:11:27 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stddef.h>
 #include <stdio.h>
 #include "philo_bonus.h"
 
@@ -29,11 +30,18 @@ void	release_forks(t_philo *p)
 
 void	notify_death(t_philo *p)
 {
-	time_t			now;
+	time_t	now;
+	size_t	i;
 
 	now = get_time();
 	sem_wait(p->ctx->sem_print);
 	printf("%ld %zu %s\n", now, p->i, "died");
+	i = 0;
+	while (i < p->ctx->n_philo)
+	{
+		sem_post(p->ctx->sem_done);
+		i++;
+	}
 }
 
 int	print_log(const t_philo *p, const char *s)

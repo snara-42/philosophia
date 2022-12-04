@@ -6,7 +6,7 @@
 /*   By: subaru <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/03 03:21:22 by subaru            #+#    #+#             */
-/*   Updated: 2022/12/03 22:58:14 by subaru           ###   ########.fr       */
+/*   Updated: 2022/12/04 12:28:32 by subaru           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	main(int ac, char *av[])
 	if ((parse_args(&ctx, ac, av) && printf(MSG1 MSG2))
 		|| (init_philos(&ctx) && printf("error init\n"))
 		|| (create_processes(&ctx) && printf("error creating thread\n"))
-		|| (wait_processes(&ctx) && printf("error joining thread\n"))
+		|| (wait_processes(&ctx) && 0)
 		|| (destroy_ctx(&ctx) && printf("error cleaning up\n"))
 	)
 		return (1);
